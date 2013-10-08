@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Pokémon Showdown
 ========================================================================
 
@@ -135,3 +136,8 @@ Contributors
 - Samuel Teo [Yilx] - Art (main background)
 - [The Immortal] - Development
 - Vivian Zou [Vtas] - Art (alternate main background)
+=======
+The OpenShift `nodejs` cartridge documentation can be found at:
+
+https://github.com/openshift/origin-server/tree/master/cartridges/openshift-origin-cartridge-nodejs/README.md
+>>>>>>> 5befab93370cbd2355e1679efc9313f0e3a4eed1
