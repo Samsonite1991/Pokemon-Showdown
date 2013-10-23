@@ -339,6 +339,7 @@ var commands = exports.commands = {
 		}
 	},
 
+	rb: 'roomban',
 	roomban: function(target, room, user, connection) {
 		if (!target) return this.parse('/help roomban');
 		target = this.splitTarget(target, true);
@@ -400,7 +401,7 @@ var commands = exports.commands = {
 	},
 
 	roomauth: function(target, room, user, connection) {
-		if (!room.auth) return this.sendReply("/roomauth - This room isn't designed for per-room moderation and therefor has no auth list.");
+		if (!room.auth) return this.sendReply("/roomauth - This room isn't designed for per-room moderation and therefore has no auth list.");
 		var buffer = [];
 		for (var u in room.auth) {
 			buffer.push(room.auth[u] + u);
@@ -455,7 +456,7 @@ var commands = exports.commands = {
 		if (!targetRoom) {
 			return this.sendReply("The room '" + target + "' does not exist.");
 		}
-		if (!this.can('kick', targetUser, room)) return false;
+		if (!this.can('warn', targetUser, room) || !this.can('warn', targetUser, targetRoom)) return false;
 		if (!targetUser || !targetUser.connected) {
 			return this.sendReply('User '+this.targetUsername+' not found.');
 		}
@@ -541,6 +542,7 @@ var commands = exports.commands = {
 		targetUser.unmute(room.id);
 	},
 
+	l: 'lock',
 	ipmute: 'lock',
 	lock: function(target, room, user) {
 		if (!target) return this.parse('/help lock');
@@ -796,6 +798,28 @@ var commands = exports.commands = {
 		this.logModCommand(user.name+' declared '+target);
 	},
 
+	gdeclare: 'globaldeclare',
+	globaldeclare: function(target, room, user) {
+		if (!target) return this.parse('/help globaldeclare');
+		if (!this.can('gdeclare')) return false;
+
+		for (var id in Rooms.rooms) {
+			if (id !== 'global') Rooms.rooms[id].addRaw('<div class="broadcast-blue"><b>'+target+'</b></div>');
+		}
+		this.logModCommand(user.name+' globally declared '+target);
+	},
+
+	cdeclare: 'chatdeclare',
+	chatdeclare: function(target, room, user) {
+		if (!target) return this.parse('/help chatdeclare');
+		if (!this.can('gdeclare')) return false;
+
+		for (var id in Rooms.rooms) {
+			if (id !== 'global') if (Rooms.rooms[id].type !== 'battle') Rooms.rooms[id].addRaw('<div class="broadcast-blue"><b>'+target+'</b></div>');
+		}
+		this.logModCommand(user.name+' globally declared (chat level) '+target);
+	},
+
 	wall: 'announce',
 	announce: function(target, room, user) {
 		if (!target) return this.parse('/help announce');
@@ -957,7 +981,7 @@ var commands = exports.commands = {
 	},
 
 	savelearnsets: function(target, room, user) {
-		if (this.can('hotpatch')) return false;
+		if (!this.can('hotpatch')) return false;
 		fs.writeFile('data/learnsets.js', 'exports.BattleLearnsets = '+JSON.stringify(BattleLearnsets)+";\n");
 		this.sendReply('learnsets.js saved.');
 	},
